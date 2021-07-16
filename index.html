@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Lista de Convidados</title>
+    </head>
+
+    <body>
+        <div id="app">
+            <h2>Lista de Convidados</h2>
+            <ul id="lista"></ul>
+
+            <h2>Maiores de 18</h2>
+            <ul id="lista2"></ul>
+
+            <h2>Menores de 18</h2>
+            <ul id="lista3"></ul>
+
+            <div>
+                <input type="text" placeholder="Digite o nome do convidado" id="nome">
+                <br>
+                <br>
+                <input type="number" placeholder="Digite a idade do convidado" id="idade">
+                <br>
+                <br>
+                <input type="text" placeholder="Digite o endereço do convidado" id="endereco">
+                <br>
+                <br>
+            </div>
+
+            <div>
+
+                <p>CONVIDADO VIP?</p>
+                <select id="vip" name="vip1">
+                    <option value="" selected="select">Selecione uma opção:</option>
+                    <option value="Sim">SIM</option>
+                    <option value="Não">NÃO</option>
+                </select>
+                <br>
+                <br>
+            </div>
+
+            <button id="botao">Cadastrar</button>
+            <button id="botao2"> Convidados +18</button>
+            <button id="botao3"> Convidados -18</button>
+
+        </div>
+
+
+        <script type="application/javascript">
+
+            var convidados = JSON.parse(localStorage.getItem("convidados")) || [];
+
+            var elLista = document.getElementById('lista');
+            var elLista2 = document.getElementById('lista2');
+            var elLista3 = document.getElementById('lista3');
+            var elNome = document.getElementById('nome');
+            var elIdade = document.getElementById('idade');
+            var elEndereco = document.getElementById('endereco');
+            var elVip = document.getElementById('vip');
+            var elBotao = document.getElementById('botao');
+            var elBotao2 = document.getElementById('botao2');
+            var elBotao3 = document.getElementById('botao3')
+
+            //Adiciona convidado a lista --------------------------------------------------------------
+
+            elBotao.onclick = function(){
+                var nome = elNome.value;
+                var idade = elIdade.value;
+                var endereco = elEndereco.value;
+                var vip = elVip.value;
+
+                convidados.push({nome: nome, idade: idade, endereco: endereco, vip: vip});
+                elNome.value = ""; //Deixa o campo em branco após cadastro
+                elIdade.value = "";
+                elEndereco.value = "";
+                elVip.value="";
+
+                salvarConvidados();
+                listarConvidados();
+            };
+
+            //-------------------------------------------------------------------------------------------------
+
+            elBotao2.onclick = function(){
+                elLista2.innerHTML = "";
+                var maiorQue18 = convidados.filter(function(item){
+                    return item.idade >= 18;
+                });
+
+                for (convidadosMaior of maiorQue18){
+                    var elMaior = document.createElement('li');
+                    var elTexto2 = document.createTextNode(`NOME: ${convidadosMaior.nome}, IDADE: ${convidadosMaior.idade}, ENDEREÇO: ${convidadosMaior.endereco}, VIP: ${convidadosMaior.vip}.`);
+
+                    elMaior.appendChild(elTexto2);
+                    elLista2.appendChild(elMaior);
+                }
+            };
+
+            elBotao3.onclick = function(){
+                elLista3.innerHTML = "";
+                var menorQue18 = convidados.filter(function(item){ 
+                    return item.idade < 18;
+                });
+
+                for (convidadosMenores of menorQue18){
+                    var elMenor = document.createElement('li');
+                    var elText3 = document.createTextNode(`NOME: ${convidadosMenores.nome}, IDADE: ${convidadosMenores.idade}, ENDEREÇO: ${convidadosMenores.endereco}, VIP: ${convidadosMenores.vip}.`);
+
+                    elMenor.appendChild(elText3);
+                    elLista3.appendChild(elMenor);
+                    } 
+                };
+
+            //-------------------------------------------------------------------------------------------------           
+
+            function salvarConvidados(){
+                localStorage.setItem("convidados", JSON.stringify(convidados));
+            };
+
+            //--------------------------------------------------------------------------------------------
+            
+            //Lista convidados------------------------------------------------------------------------
+            function listarConvidados(){
+                elLista.innerHTML = ""; //Deixa a lista em branco em cada repetição for
+
+                for (const convidado of convidados){
+                    var elConvidado =  document.createElement('li');
+
+                    var elTexto = document.createTextNode(`NOME: ${convidado.nome}, IDADE: ${convidado.idade}, ENDEREÇO: ${convidado.endereco}, VIP: ${convidado.vip}.`);
+
+                    var elExcluir = document.createElement('a');
+                    elExcluir.setAttribute("href", "#");
+
+                    elExcluir.onclick = function(){
+                        location.reload()
+
+                        convidados = convidados.filter(function(item){
+                            return item.nome !== convidado.nome;
+                        });
+
+                        salvarConvidados();
+                        listarConvidados();
+                    };
+
+                    var elExcluirTexto = document.createTextNode(' Excluir');
+
+                    elConvidado.appendChild(elTexto);
+                    elLista.appendChild(elConvidado);
+                    elConvidado.appendChild(elExcluir);
+                    elExcluir.appendChild(elExcluirTexto);
+                }
+            };
+
+            listarConvidados();
+            //----------------------------------------------------------------------------------------
+        
+        </script>
+    </body>
+</html>
